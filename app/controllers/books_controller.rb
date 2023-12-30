@@ -1,6 +1,6 @@
 class BooksController < ApplicationController
-before_action :is_matching_login_user
-before_action :is_matching_login_book,only: [:edit]
+ before_action :authenticate_user!
+ before_action :ensure_correct_user, only: [:edit, :update, :destroy]
 
   def index
     @books = Book.all
@@ -10,9 +10,8 @@ before_action :is_matching_login_book,only: [:edit]
   def create
     @book = Book.new(book_params)
     @book.user_id = current_user.id
-    @user = current_user
     if @book.save
-      redirect_to book_path(@book), notice: "You have create book successfully."
+      redirect_to book_path(@book), notice: "You have created book successfully."
     else
       @books = Book.all
       render 'index'
@@ -20,13 +19,16 @@ before_action :is_matching_login_book,only: [:edit]
   end
 
 
-  def show
-    @book = Book.find(params[:id])
-  end
-
   def edit
     @book = Book.find(params[:id])
+    @user = User.find(params[:id])
   end
+
+  def show
+    @book = Book.find(params[:id])
+    @book_new = Book.new
+  end
+
 
   def update
     @book = Book.find(params[:id])
@@ -37,10 +39,11 @@ before_action :is_matching_login_book,only: [:edit]
     end
   end
 
+
   def destroy
     @book = Book.find(params[:id])
     @book.destroy
-    redirect_to books_path
+    redirect_to books_path, notice: "successfully delete book!"
   end
 
 
@@ -50,19 +53,12 @@ before_action :is_matching_login_book,only: [:edit]
     params.require(:book).permit(:title,:body)
   end
 
-   def is_matching_login_user
-     unless user_signed_in?
-     redirect_to new_user_session_path
-     end
-   end
 
-
-  def is_matching_login_book
+  def ensure_correct_user
     @book = Book.find(params[:id])
-    unless @book.user_id == current_user.id
-      redirect_to books_path
+    unless @book.user == current_user
+    redirect_to books_path
     end
   end
-
 
 end
