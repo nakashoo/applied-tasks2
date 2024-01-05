@@ -1,6 +1,4 @@
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
@@ -12,21 +10,22 @@ class User < ApplicationRecord
   has_many :book_comments, dependent: :destroy
   has_one_attached :profile_image
 
+  has_many :subjective_relationships, class_name: "Relationship", foreign_key: "followed_id", dependent: :destroy
+  has_many :followerside, through: :subjective_relationships, source: :follower
+
+  has_many :objective_relationships, class_name: "Relationship", foreign_key: "follower_id", dependent: :destroy
+  has_many :followedside, through: :objective_elationships, source: :followed
+
+
+
+  has_many :relation, through: :relationships, source: :relationships
+
 
   def get_profile_image
     (profile_image.attached?) ? profile_image : 'no_image.jpg'
   end
 
-  #   validate :custom_name_validation
 
-  # private
 
-  # def custom_name_validation
-  #   if name.blank?
-  #     errors.add(:name, "can't be blank")
-  #   elsif name.length < 2
-  #     errors.add(:name, "is too short (minimum is 2 characters)")
-  #   end
-  # end
 
 end
