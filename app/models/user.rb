@@ -17,7 +17,6 @@ class User < ApplicationRecord
   has_many :followedside, through: :objective_elationships, source: :followed
 
 
-
   has_many :relation, through: :relationships, source: :relationships
 
 
