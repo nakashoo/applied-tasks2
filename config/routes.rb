@@ -5,7 +5,10 @@ Rails.application.routes.draw do
   get "home/about"=>"homes#about", as: 'about'
 
   resources :users, only: [:index,:show,:edit,:update] do
-    resource :relationship, only: [:index, :create, :destroy]
+    member do
+      get :follows, :followers
+    end
+      resource :relationships, only: [:create, :destroy]
   end
 
   resources :books do
